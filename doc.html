@@ -1,5 +1,8 @@
-<h1>Person Concordancer 1.1</h1>
-<p>This is a tool to find general identifiers for persons, just by providing some basic data. This is version <b>1.1</b>.</p>
+<h1>Person Concordancer 1.2</h1>
+<p>This is a tool to find general identifiers for persons, just by providing some basic data. This is version <b>1.2</b>.</p>
+<h2>Method</h2>
+<p>Person data is compared in sets of (predefined) contexts. Basically, every information needs to be confirmed by a second information in the same context to be plausible. As contexts can overlap, it is possible that one information can be evaluated more than once.</p>
+<p>Every person that matches a context gains points according to the relevance of the context. Points are accumulated from all context comparisons. The highest possible score can differ, depending on the request.</p>
 <h2>Parameters</h2>
 <p>You can submit a request by a combination of URL parameters.</p>
 <ul>
@@ -11,35 +14,40 @@
 	<li><i>pd</i> - place of death</li>
 	<li><i>d</i> - description keywords</li>
 </ul>
-<p>examples:</p>
+<h3>Hints</h4>
 <ul>
-	<li><a href="?on=Sebastian&n=Bach&db=1685&dd=1750&pb=Eisenach&d=Organist" target="_blank">a request with many details</a></li>
-	<li><a href="?n=Virchow&d=Arzt" target="_blank">a request with only name and description</a></li>
+	<li>names/descriptions can consist of more than one word</li>
 </ul>
-<h2>Method</h2>
-<p>Person data is compared in sets of (predefined) contexts. Basically, every information needs to be confirmed by a second information in the same context to be plausible. As contexts can overlap, it is possible that one information can be evaluated more than once.</p>
-<p>Every person that matches a context gains points according to the relevance of the context. Points are accumulated over all context comparisons. Thus, the maximum score can differ, depending on the request.</p>
+<h3>Examples</h3>
+<ul>
+	<li><a href="?on=Sebastian&n=Bach&db=1685&dd=1750&pb=Eisenach&d=Organist">a request with many details</a></li>
+	<li><a href="?n=Virchow&d=Arzt">a request with only name and description</a></li>
+	<li><a href="?d=Journalist&pd=London&dd=1883">a request without a name</a></li>
+</ul>
 <h2>Results</h2>
 <ul>
 <li>results will be returned in XML</li>
-<li>if there are more than 5 results, the following 5 results will be only displayed with a score of 40 or more</li>
-<li>more than 10 results will not be displayed</li>
+<li>if there are more than <?php echo MIN_PERSONS ?> results, the following <?php echo MAX_PERSONS-MIN_PERSONS ?> results will be displayed with a score of <?php echo MIN_SCORE ?> or more</li>
+<li>more than <?php echo MAX_PERSONS ?> results will not be displayed</li>
 </ul>
-<h2>Scores</h2>
+<h2>Scoring</h2>
 <table>
-	<tr><td>Concordance of name and other names</td><td>+30</td></tr>
-	<tr><td>Concordance of all name parts</td><td>+15</td></tr>
-	<tr><td>Concordance of name and year of birth/death</td><td>+30</td></tr>
-	<tr><td>Concordance of name and description</td><td>+20</td></tr>
-	<tr><td>Concordance of exact date and place of birth</td><td>+15</td></tr>
-	<tr><td>Concordance of exact date and place of death</td><td>+15</td></tr>
+<?php
+	foreach ($contexts as $context) {
+		echo '<tr>';
+		echo '<td>'.$context['description'].'</td>';
+		echo '<td>+'.$context['score'].'</td>';
+		echo '</tr>';
+	}
+?>
 </table>
+<p>The scores are still experimental.</p>
 <h2>Resources / Acknowledgements</h2>
-<p>The tool depends on resources from <a href="http://toolserver.org/~apper/pd/">http://toolserver.org/~apper/pd/</a>. It works with a database dump which may not be 100% synced with the current Wikipedia.</p>
+<p>The tool depends on resources from <a href="http://toolserver.org/~apper/pd/">http://toolserver.org/~apper/pd/</a>. It works with a database dump, which may not be 100% synced with the current Wikipedia.</p>
 <h2>Other Versions</h2>
 <ul>
 	<li><a href="../1-0/">Version 1.0</a></li>
-	<li><a href="../1-2/">Version 1.2</a></li>
+	<li><a href="../1-1/">Version 1.1</a></li>
 	<li><a href="../1-3/">Version 1.3</a></li>
 	<li><a href="../1-4/">Version 1.4</a></li>
 </ul>

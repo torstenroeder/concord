@@ -2,19 +2,19 @@
 
 $parameters = array(
 	// names
-	'n'		=> array( 'name' => 'name',					'type' => 'string',		'score' => 60, 'description' => 'principal name' ),
-	'on'	=> array( 'name' => 'otherNames',			'type' => 'string',		'score' => 30, 'description' => 'other names' ),
-	'd'		=> array( 'name' => 'description',			'type' => 'string',		'score' => 30, 'description' => 'description (keywords as occupation, ethnicity, title or rank)' ),
-//	'g'		=> array( 'name' => 'gender',				'type' => 'char',		'score' => 60, 'description' => 'gender (m or f)' ),
+	'n'		=> array( 'name' => 'name',					'type' => 'string',		'table' => 'pd',	'score' => 60,	'classification' => NULL,			'description' => 'principal name (surname, common forenames, an official name)' ),
+	'on'	=> array( 'name' => 'otherNames',			'type' => 'string',		'table' => 'pd',	'score' => 30,	'classification' => NULL,			'description' => 'other names (forenames, less official names, uncommon names)' ),
+	'd'		=> array( 'name' => 'description',			'type' => 'string',		'table' => 'pd',	'score' => 30,	'classification' => NULL,			'description' => 'description (keywords as occupation, ethnicity, title or rank)' ),
 
-	'db'	=> array( 'name' => 'dateOfBirth',			'type' => 'date',		'score' => 30, 'description' => 'date of birth (ISO 8601: YYYY-MM-DD, YYYY-MM, YYYY, dashes are optional)' ),
-	'pb'	=> array( 'name' => 'placeOfBirth',			'type' => 'string',		'score' => 12, 'description' => 'place of birth' ),
+	'db'	=> array( 'name' => 'dateOfBirth',			'type' => 'date',		'table' => 'pd',	'score' => 30,	'classification' => NULL,			'description' => 'date of birth¹' ),
+	'pb'	=> array( 'name' => 'placeOfBirth',			'type' => 'string',		'table' => 'pd',	'score' => 12,	'classification' => NULL,			'description' => 'place of birth' ),
 
-	'dd'	=> array( 'name' => 'dateOfDeath',			'type' => 'date',		'score' => 48, 'description' => 'date of death (ISO 8601: YYYY-MM-DD, YYYY-MM, YYYY, dashes are optional)' ),
-	'pd'	=> array( 'name' => 'placeOfDeath',			'type' => 'string',		'score' => 24, 'description' => 'place of death' )
+	'dd'	=> array( 'name' => 'dateOfDeath',			'type' => 'date',		'table' => 'pd',	'score' => 48,	'classification' => NULL,			'description' => 'date of death¹' ),
+	'pd'	=> array( 'name' => 'placeOfDeath',			'type' => 'string',		'table' => 'pd',	'score' => 24,	'classification' => NULL,			'description' => 'place of death' ),
 
-//	'ya'	=> array( 'name' => 'yearOfActivity',		'type' => 'date',		'score' => 24, 'description' => 'year of activity (YYYY) = a year between birth and death' )
-//	'ca'	=> array( 'name' => 'countryOfActivity',	'type' => 'country',	'score' => 12, 'description' => 'country of activity (ISO 3-letter-code, comma separated)' )
+	'g'		=> array( 'name' => 'gender',				'type' => 'char',		'table' => 'sex',	'score' => 60,	'classification' => 'secondary',	'description' => 'gender (m or f)' ),
+	'ya'	=> array( 'name' => 'yearOfActivity',		'type' => 'date',		'table' => 'pd',	'score' => 24,	'classification' => 'secondary',	'description' => 'year of activity (YYYY) = a year between birth and death' ),
+	'ca'	=> array( 'name' => 'countryOfActivity',	'type' => 'country',	'table' => 'pd',	'score' => 12,	'classification' => 'secondary',	'description' => 'country of activity²' )
 );
 
 foreach ($parameters as $parameterKey => $parameter) {

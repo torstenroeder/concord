@@ -1,8 +1,9 @@
-<h1>Person Concordancer 1.3</h1>
+<h1>Person Concordancer 1.4</h1>
 <p>This is a tool to find general identifiers for persons, just by providing some basic data.</p>
 <h2>Method</h2>
-<p>Basically, all given properties are compared to the entries in a large database. Each match adds some points to a total score.</p>
-<p>Points are weighted by importance and probability for identification.</p>
+<p>Basically, all given properties are compared to the entries in a large database. Each match adds some points to a total score. Points are weighted by importance and probability for identification.</p>
+<p>There is a preparatory search that classifies the properties into <b>primary parameters</b> (which produce a reasonable number of results) and <b>secondary parameters</b> (which are very general and produce a large number of results).</p>
+<p>The list of persons is deducted by the primary parameters. This list is then re-validated by the secondary parameters. I believe this makes it a quick and efficient procedure.</p>
 <h2>Parameters</h2>
 <p>You can submit a request by a combination of URL parameters.</p>
 <table>
@@ -10,28 +11,35 @@
 	foreach ($parameters as $parameterKey => $parameter) {
 	echo '<tr>';
 	echo "<td>{$parameterKey}</td>";
-	echo "<td>&rarr; {$parameter['description']}</td>";
+	echo "<td>{$parameter['description']}</td>";
 	echo '</tr>';
 	}
 	?>
 </table>
-<p>*) ISO 8601: YYYY-MM-DD, YYYY-MM, YYYY, dashes are optional</p>
+<p>¹) ISO 8601: YYYY-MM-DD, YYYY-MM, YYYY, dashes are optional</p>
+<p>²) ISO 3166-1 numeric-3: see <a href="http://en.wikipedia.org/wiki/ISO_3166-1_numeric" target="_blank">this list</a> for a reference.</p>
 <h3>Hints</h4>
 <ul>
 	<li>Names, places and descriptions may contain more than one word.</li>
-	<li>Any query that exceeds a certain limit of results will be ignored.</li>
+	<li>Any parameter that returns <?php echo LIMIT_MATCHES ?> or more results (“critical mass”) is considered secondary.</li>
+	<li>Some parameters are <i>always</i> secondary (gender, country, activity).</li>
 </ul>
 <h3>Examples</h3>
 <ul>
 	<li><a href="?on=Sebastian&n=Bach&db=1685&dd=1750&pb=Eisenach&d=Organist">a request with many details</a></li>
 	<li><a href="?n=Virchow&d=Arzt">a request with only name and description</a></li>
+	<li><a href="?n=Rudolf&d=Arzt&pb=Pommern">a request with first name, birthplace and description</a></li>
+	<li><a href="?on=Johann Sebastian&n=Bach&ya=1700">a request with an ambiguous name, seconded by year of activity</a>
 	<li><a href="?d=Journalist&pd=London&dd=1883">a request without a name</a></li>
+	<li><a href="?n=Rosenbaum&g=f&ya=1900">a request for a female person with name and year of activity</a></li>
+	<li><a href="?db=1900&ca=276&g=f">a request with secondary parameters only</a></li>
 </ul>
 <h2>Results</h2>
 <ul>
-<li>Results will be returned in XML.</li>
-<li>if there are more than <?php echo MIN_PERSONS ?> results, the following <?php echo MAX_PERSONS-MIN_PERSONS ?> results will be displayed with a score of <?php echo MIN_SCORE ?> or more</li>
-<li>more than <?php echo MAX_PERSONS ?> results will not be displayed</li>
+<li>Results are returned in XML.</li>
+<li>More than <?php echo MAX_PERSONS ?> results are never displayed.</li>
+<li>If there are more than <?php echo MIN_PERSONS ?> results, the following results (up to <?php echo MAX_PERSONS-MIN_PERSONS ?>) are displayed only with a score of <?php echo MIN_SCORE ?> or more.</li>
+<li>The results are not perfect. They are only proposals. Although it is likely that in many cases the first result is the person you are looking for, this is never guaranteed.</li>
 </ul>
 <h2>Scoring</h2>
 <table>
@@ -44,7 +52,8 @@
 	}
 	?>
 </table>
-<p>The scores are still experimental.</p>
+<p>The weighting is still experimental.</p>
+<p>Every match in the response list contains an evaluation of the score, which is relative to the best possible result.</p>
 <h2>Resources / Acknowledgements</h2>
 <p>The tool depends on resources from <a href="http://toolserver.org/~apper/pd/">http://toolserver.org/~apper/pd/</a>. It works with a database dump, which may not be 100% synced with the current Wikipedia.</p>
 <h2>Other Versions</h2>
@@ -52,5 +61,5 @@
 	<li><a href="../1-0/">Version 1.0</a></li>
 	<li><a href="../1-1/">Version 1.1</a></li>
 	<li><a href="../1-2/">Version 1.2</a></li>
-	<li><a href="../1-4/">Version 1.4</a></li>
+	<li><a href="../1-3/">Version 1.3</a></li>
 </ul>

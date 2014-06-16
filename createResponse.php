@@ -1,5 +1,7 @@
 <?php
 
+// TODO geschlecht und länder noch einbinden
+
 function mysql_wiki_fetch_normdaten ($wiki_id) {
 	$qs = 'SELECT * FROM normdaten WHERE id='.$wiki_id;
 	$result = mysql_query($qs);
@@ -16,7 +18,7 @@ $xml->setIndent(FALSE);
 $xml->startDocument('1.0','UTF-8');
 // go
 $xml->startElement('concordance');
-	$xml->writeAttribute('version','1.3');
+	$xml->writeAttribute('version','1.4');
 	$xml->startElement('request');
 		$xml->writeAttribute('minPersons',MIN_PERSONS);
 		$xml->writeAttribute('maxPersons',MAX_PERSONS);
@@ -55,17 +57,24 @@ $xml->startElement('concordance');
 	$xml->endElement();
 		$xml->startElement('queries');
 		$xml->writeAttribute('criticalMass',LIMIT_MATCHES);
+		$xml->writeAttribute('highestScore',reset($personScores));
+		$xml->writeAttribute('optimalScore',$optimalScore);
+		$xml->writeAttribute('perfectScore',$perfectScore);
+		$xml->writeAttribute('requestQuality',$requestQuality.'%');
 		foreach ($parameters as $parameterKey => $parameter) {
 			if (count($parameter['queries']) > 0) {
 				$xml->startElement('query');
 					$xml->writeAttribute('parameter',$parameter['name']);
 					$xml->writeAttribute('score',$parameter['score']);
+					$xml->writeAttribute('classification',$parameter['classification']);
 					$xml->writeAttribute('matches',$parameter['matches']);
+					/*
 					foreach ($parameter['queries'] as $queryKey => $query) {
 						$xml->startElement('queryPart');
 						$xml->text($query);
 						$xml->endElement();
 					}
+					*/
 				$xml->endElement();
 			}
 		}
@@ -74,30 +83,15 @@ $xml->startElement('concordance');
 	reset($personScores);
 	$xml->startElement('results');
 		$xml->writeAttribute('count',count($personScores));
-		$xml->startElement('queries');
-			$xml->writeAttribute('perfectScore',$perfectScore);
-			$xml->writeAttribute('optimalScore',$optimalScore);
-			$xml->writeAttribute('highestScore',reset($personScores));
-			$xml->writeAttribute('requestQuality',$requestQuality.'%');
-			/*
-			foreach ($queries as $key => $query) {
-				$xml->startElement('context');
-				$xml->writeAttribute('name',$key);
-				$xml->writeAttribute('score',$contexts[$key]['score']);
-				$xml->text($contexts[$key]['description']);
-				$xml->endElement();
-			}
-			*/
-		$xml->endElement();
 		$counter = 0;
 		while (list($key,$value) = each($personScores)) {
 			$counter++;
 			$relativeValue = floor(100 * $value / $optimalScore);
 			if ($counter <= MIN_PERSONS || ($counter <= MAX_PERSONS && $value >= MIN_SCORE)) {
 				$xml->startElement('match');
-					$xml->writeAttribute('absoluteScore',$value);
-					$xml->writeAttribute('relativeScore',$relativeValue.'%');
-					$xml->writeAttribute('matchQuality',floor($relativeValue * $requestQuality / 100).'%');
+					$xml->writeAttribute('score',$value);
+					$xml->writeAttribute('optimal',$relativeValue.'%');
+					$xml->writeAttribute('perfect',floor($relativeValue * $requestQuality / 100).'%');
 					// person
 					$xml->startElement('person');
 						// wikipedia person data
@@ -108,6 +102,7 @@ $xml->startElement('concordance');
 						$xml->writeElement('dateOfDeath',$persons[$key]->died);
 						$xml->writeElement('placeOfDeath',$persons[$key]->d_place);
 						$xml->writeElement('description',$persons[$key]->description);
+						// TODO hier noch GENDER und COUNTRY einbinden!
 						// wikipedia reference
 						$xml->startElement('reference');
 							$xml->writeAttribute('provider','Wikipedia');
@@ -123,9 +118,17 @@ $xml->startElement('concordance');
 							$xml->text($key);
 						$xml->endElement();
 						if ($normdaten = mysql_wiki_fetch_normdaten($key)) {
-							if ($normdaten['pnd']) {
+							if ($normdaten['gnd']) {
 								$xml->startElement('personId');
-									$xml->writeAttribute('provider','PND');
+									$xml->writeAttribute('provider','GND');
+									$xml->writeAttribute('url','http://d-nb.info/gnd/'.$normdaten['gnd']);
+									$xml->text($normdaten['gnd']);
+								$xml->endElement();
+							}
+							elseif ($normdaten['pnd']) {
+								// wenn keine GND vorhanden ist, gilt: GND = PND
+								$xml->startElement('personId');
+									$xml->writeAttribute('provider','GND');
 									$xml->writeAttribute('url','http://d-nb.info/gnd/'.$normdaten['pnd']);
 									$xml->text($normdaten['pnd']);
 								$xml->endElement();
@@ -147,8 +150,8 @@ $xml->startElement('concordance');
 						} // if
 					$xml->endElement(); // identifiers
 				$xml->endElement();
-			}
-		}
+			} // if
+		} // while
 	$xml->endElement(); // results
 $xml->endElement();
 

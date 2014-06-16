@@ -24,11 +24,10 @@ foreach ($parameters as $parameterKey => $parameter) {
 				break;
 			case 'description':
 				foreach($parameter['tokens'] as $token) {
-					$current['queries'][] = "MATCH (description) AGAINST ('$token' WITH QUERY EXPANSION)";
+					// bei Bedarf die unscharfe Suche wieder einkommentieren
+					//$current['queries'][] = "MATCH (description) AGAINST ('$token' WITH QUERY EXPANSION)";
+					$current['queries'][] = "MATCH (description) AGAINST ('$token')";
 				}
-				break;
-			case 'gender':
-				//$current['queries'][] = "MATCH (description) AGAINST ('$token' WITH QUERY EXPANSION)";
 				break;
 			case 'dateOfBirth':
 				if ($parameter['tokens']['y']) $current['queries'][] = 'b_year='.$parameter['tokens']['y'];
@@ -50,15 +49,21 @@ foreach ($parameters as $parameterKey => $parameter) {
 					$current['queries'][] = "MATCH (d_place) AGAINST ('$token')";
 				}
 				break;
+			case 'gender':
+				if ($parameter['value'] == 'm') {
+					$current['queries'][] = "sex=1";
+				}
+				elseif ($parameter['value'] == 'f') {
+					$current['queries'][] = "sex=2";
+				}
+				break;
 			case 'yearOfActivity':
 				if ($parameter['tokens']['y']) $current['queries'][] = $parameter['tokens']['y'].' BETWEEN b_year AND d_year';
 				break;
 			case 'countryOfActivity':
-				/*
 				foreach($parameter['tokens'] as $token) {
-					$current['queries'][] = "MATCH (b_place) AGAINST ('$token') OR MATCH (d_place) AGAINST ('$token')";
+					$current['queries'][] = "country=$token";
 				}
-				*/
 				break;
 		} // switch
 	} // if

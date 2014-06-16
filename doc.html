@@ -1,0 +1,38 @@
+<h1>Person Concordancer 1.0</h1>
+<p>This is a tool to find general identifiers for persons, just by providing some basic data. This is version <b>1.0</b>.</p>
+<h2>Parameters</h2>
+<p>You can submit a request by a combination of URL parameters.</p>
+<ul>
+	<li>n (principal name)</li>
+	<li>on (other names)</li>
+	<li>dob (date of birth, ISO 8601)</li>
+	<li>pob (place of birth)</li>
+	<li>dod (date of death, ISO 8601)</li>
+	<li>pod (place of death)</li>
+	<li>desc (description)</li>
+</ul>
+<p>examples:</p>
+<ul>
+	<li><a href="?on=Sebastian&n=Bach&dob=1685&dod=1750&pob=Eisenach&desc=Organist">http://pdrdev.bbaw.de/concord/?on=Sebastian&n=Bach&dob=1685&dod=1750&pob=Eisenach&desc=Organist</a></li>
+	<li><a href="?n=Virchow&desc=Arzt">http://pdrdev.bbaw.de/concord/?n=Virchow&desc=Arzt</a></li>
+</ul>
+<h2>Results</h2>
+<p>Results will be returned in XML.</p>
+<p>If there are more than 5 results, the following 5 results will be only displayed with a score of 40 or more. More than 10 results will not be displayed.</p>
+<h2>Scores</h2>
+<ul>
+	<li>Concordance of name and other names = 40</li>
+	<li>Concordance of name and year of birth/death = 30</li>
+	<li>Concordance of exact date and place of birth = 15</li>
+	<li>Concordance of exact date and place of death = 15</li>
+	<li>Concordance of name and description = 20</li>
+</ul>
+<h2>How does this work?</h2>
+<p>The tool depends on the resource at <a href="http://toolserver.org/~apper/pd/">http://toolserver.org/~apper/pd/</a>. It is recommended to check the availability before using the concordancer.</p>
+<h2>Other Versions</h2>
+<ul>
+	<li><a href="../1-1/">Version 1.1</a></li>
+	<li><a href="../1-2/">Version 1.2</a></li>
+	<li><a href="../1-3/">Version 1.3</a></li>
+	<li><a href="../1-4/">Version 1.4</a></li>
+</ul>

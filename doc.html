@@ -1,5 +1,5 @@
-<h1>Person Concordancer 1.4</h1>
-<p>This is a tool to find general identifiers for persons, just by providing some basic data.</p>
+<h1>Person Concordancer 1.5</h1>
+<p>This is a tool to find general identifiers for persons, just by providing some basic data. It works with person data provided by Wikipedia.</p>
 <h2>Method</h2>
 <p>Basically, all given properties are compared to the entries in a large database. Each match adds some points to a total score. Points are weighted by importance and probability for identification.</p>
 <p>There is a preparatory search that classifies the properties into <b>primary parameters</b> (which produce a reasonable number of results) and <b>secondary parameters</b> (which are very general and produce a large number of results).</p>
@@ -56,10 +56,15 @@
 <p>Every match in the response list contains an evaluation of the score, which is relative to the best possible result.</p>
 <h2>Resources / Acknowledgements</h2>
 <p>The tool depends on resources from <a href="http://toolserver.org/~apper/pd/">http://toolserver.org/~apper/pd/</a>. It works with a database dump, which may not be 100% synced with the current Wikipedia.</p>
+<h2>Updates</h2>
+<ul>
+	<li>The response contains dates in ISO 8601 format.</li>
+</ul>
 <h2>Other Versions</h2>
 <ul>
 	<li><a href="../1-0/">Version 1.0</a></li>
 	<li><a href="../1-1/">Version 1.1</a></li>
 	<li><a href="../1-2/">Version 1.2</a></li>
 	<li><a href="../1-3/">Version 1.3</a></li>
+	<li><a href="../1-4/">Version 1.4</a></li>
 </ul>

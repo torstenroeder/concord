@@ -97,9 +97,23 @@ $xml->startElement('concordance');
 						// wikipedia person data
 						$xml->writeElement('name',$persons[$key]->name);
 						$xml->writeElement('otherNames',$persons[$key]->altname);
-						$xml->writeElement('dateOfBirth',$persons[$key]->born);
+						$xml->startElement('dateOfBirth');
+							$when = '';
+							$when .= sprintf('%04d',$persons[$key]->b_year);
+							$when .= '-'.sprintf('%02d',$persons[$key]->b_month);
+							$when .= '-'.sprintf('%02d',$persons[$key]->b_day);
+							$xml->writeAttribute('when',$when);
+							$xml->text($persons[$key]->born);
+						$xml->endElement();
 						$xml->writeElement('placeOfBirth',$persons[$key]->b_place);
-						$xml->writeElement('dateOfDeath',$persons[$key]->died);
+						$xml->startElement('dateOfDeath');
+							$when = '';
+							$when .= sprintf('%04d',$persons[$key]->d_year);
+							$when .= '-'.sprintf('%02d',$persons[$key]->d_month);
+							$when .= '-'.sprintf('%02d',$persons[$key]->d_day);
+							$xml->writeAttribute('when',$when);
+							$xml->text($persons[$key]->died);
+						$xml->endElement();
 						$xml->writeElement('placeOfDeath',$persons[$key]->d_place);
 						$xml->writeElement('description',$persons[$key]->description);
 						// TODO hier noch GENDER und COUNTRY einbinden!

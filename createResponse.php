@@ -16,37 +16,70 @@ $xml->setIndent(FALSE);
 $xml->startDocument('1.0','UTF-8');
 // go
 $xml->startElement('concordance');
-	$xml->writeAttribute('version','1.2');
+	$xml->writeAttribute('version','1.3');
 	$xml->startElement('request');
 		$xml->writeAttribute('minPersons',MIN_PERSONS);
 		$xml->writeAttribute('maxPersons',MAX_PERSONS);
 		$xml->writeAttribute('minScore',MIN_SCORE);
-		$xml->writeElement('name',$get['name']);
-		$xml->writeElement('otherNames',$get['otherNames']);
-		$xml->startElement('dateOfBirth');
-			if ($get['yearOfBirth']) $xml->writeAttribute('year',$get['yearOfBirth']);
-			if ($get['monthOfBirth']) $xml->writeAttribute('month',$get['monthOfBirth']);
-			if ($get['dayOfBirth']) $xml->writeAttribute('day',$get['dayOfBirth']);
-			$xml->text($get['dateOfBirth']);
-		$xml->endElement();
-		$xml->writeElement('placeOfBirth',$get['placeOfBirth']);
-		$xml->startElement('dateOfDeath');
-			if ($get['yearOfDeath']) $xml->writeAttribute('year',$get['yearOfDeath']);
-			if ($get['monthOfDeath']) $xml->writeAttribute('month',$get['monthOfDeath']);
-			if ($get['dayOfDeath']) $xml->writeAttribute('day',$get['dayOfDeath']);
-			$xml->text($get['dateOfDeath']);
-		$xml->endElement();
-		$xml->writeElement('placeOfDeath',$get['placeOfDeath']);
-		$xml->writeElement('description',$get['description']);
+		foreach ($parameters as $parameterKey => $parameter) {
+			switch ($parameter['type']) {
+				case 'string':
+					$xml->startElement($parameter['name']);
+						if (count($parameter['tokens']) > 0) $xml->writeAttribute('tokens',count($parameter['tokens']));
+						$xml->text($parameter['value']);
+					$xml->endElement();
+				break;
+				case 'date':
+					$xml->startElement($parameter['name']);
+						if ($parameter['tokens']['c']) $xml->writeAttribute('century',$parameter['tokens']['c']);
+						if ($parameter['tokens']['y']) $xml->writeAttribute('year',$parameter['tokens']['y']);
+						if ($parameter['tokens']['m']) $xml->writeAttribute('month',$parameter['tokens']['m']);
+						if ($parameter['tokens']['d']) $xml->writeAttribute('day',$parameter['tokens']['d']);
+						$xml->text($parameter['value']);
+					$xml->endElement();
+				break;
+				case 'country':
+					$xml->startElement($parameter['name']);
+						if (count($parameter['tokens']) > 0) $xml->writeAttribute('tokens',count($parameter['tokens']));
+						$xml->text($parameter['value']);
+					$xml->endElement();
+				break;
+				case 'char':
+					$xml->startElement($parameter['name']);
+						$xml->text($parameter['value']);
+					$xml->endElement();
+				break;
+			}
+			
+		}
 	$xml->endElement();
-	reset($scores);
-	$xml->startElement('results');
-		$xml->writeAttribute('count',count($scores));
 		$xml->startElement('queries');
-			$xml->writeAttribute('highestScore',reset($scores));
-			$xml->writeAttribute('highestPossibleScore',$maxPossibleScore);
-			$xml->writeAttribute('superScore',$superScore);
-			$xml->writeAttribute('requestAffidability',$maxAffidability.'%');
+		$xml->writeAttribute('criticalMass',LIMIT_MATCHES);
+		foreach ($parameters as $parameterKey => $parameter) {
+			if (count($parameter['queries']) > 0) {
+				$xml->startElement('query');
+					$xml->writeAttribute('parameter',$parameter['name']);
+					$xml->writeAttribute('score',$parameter['score']);
+					$xml->writeAttribute('matches',$parameter['matches']);
+					foreach ($parameter['queries'] as $queryKey => $query) {
+						$xml->startElement('queryPart');
+						$xml->text($query);
+						$xml->endElement();
+					}
+				$xml->endElement();
+			}
+		}
+	$xml->endElement();
+	
+	reset($personScores);
+	$xml->startElement('results');
+		$xml->writeAttribute('count',count($personScores));
+		$xml->startElement('queries');
+			$xml->writeAttribute('perfectScore',$perfectScore);
+			$xml->writeAttribute('optimalScore',$optimalScore);
+			$xml->writeAttribute('highestScore',reset($personScores));
+			$xml->writeAttribute('requestQuality',$requestQuality.'%');
+			/*
 			foreach ($queries as $key => $query) {
 				$xml->startElement('context');
 				$xml->writeAttribute('name',$key);
@@ -54,16 +87,17 @@ $xml->startElement('concordance');
 				$xml->text($contexts[$key]['description']);
 				$xml->endElement();
 			}
+			*/
 		$xml->endElement();
 		$counter = 0;
-		while (list($key,$value) = each($scores)) {
+		while (list($key,$value) = each($personScores)) {
 			$counter++;
-			$relativeValue = floor(100 * $value / $maxPossibleScore);
+			$relativeValue = floor(100 * $value / $optimalScore);
 			if ($counter <= MIN_PERSONS || ($counter <= MAX_PERSONS && $value >= MIN_SCORE)) {
 				$xml->startElement('match');
 					$xml->writeAttribute('absoluteScore',$value);
 					$xml->writeAttribute('relativeScore',$relativeValue.'%');
-					$xml->writeAttribute('matchAffidability',floor($relativeValue * $maxAffidability / 100).'%');
+					$xml->writeAttribute('matchQuality',floor($relativeValue * $requestQuality / 100).'%');
 					// person
 					$xml->startElement('person');
 						// wikipedia person data
@@ -115,7 +149,7 @@ $xml->startElement('concordance');
 				$xml->endElement();
 			}
 		}
-	$xml->endElement();
+	$xml->endElement(); // results
 $xml->endElement();
 
 ?>

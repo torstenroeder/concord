@@ -1,86 +1,89 @@
 <?php
 
-$get = array();
-
-$get['name'] = getUrlParameter ('n',NULL);
-$get['nameParts'] = explode(' ',$get['name']);
-
-$get['otherNames'] = getUrlParameter ('on',NULL);
-$get['otherNameParts'] = explode(' ',$get['otherNames']);
-
-$get['description'] = getUrlParameter ('d',NULL);
-$get['descriptionParts'] = explode(' ',$get['description']);
-
-$get['placeOfBirth'] = getUrlParameter ('pb',NULL);
-
-$get['placeOfDeath'] = getUrlParameter ('pd',NULL);
-
-$get['dateOfBirth'] = getUrlParameter ('db',NULL);
-if ($get['dateOfBirth']){
-	$get['dateOfBirth'] = str_replace('-','',$get['dateOfBirth']);
-	switch (strlen($get['dateOfBirth'])) {
-		case 4:
-			$get['yearOfBirth'] = substr ($get['dateOfBirth'],0,4);
-			$get['monthOfBirth'] = NULL;
-			$get['dayOfBirth'] = NULL;
-			break;
-		case 6:
-			$get['yearOfBirth'] = substr ($get['dateOfBirth'],0,4);
-			$get['monthOfBirth'] = substr ($get['dateOfBirth'],4,2);
-			$get['dayOfBirth'] = NULL;
-			break;
-		case 8:
-			$get['yearOfBirth'] = substr ($get['dateOfBirth'],0,4);
-			$get['monthOfBirth'] = substr ($get['dateOfBirth'],4,2);
-			$get['dayOfBirth'] = substr ($get['dateOfBirth'],6,2);
-			break;
-		default:
-			// invalid
-			$get['dateOfBirth'] = NULL;
-			$get['yearOfBirth'] = NULL;
-			$get['monthOfBirth'] = NULL;
-			$get['dayOfBirth'] = NULL;
-			break;
+foreach ($parameters as $parameterKey => $parameter) {
+	$current = &$parameters[$parameterKey];
+	switch ($parameter['type']) {
+		case 'string':
+			$current['value'] = getUrlParameter ($parameterKey,NULL);
+			if ($current['value']) {
+				$current['tokens'] = explode(' ',$current['value']);
+			}
+		break; // case 'string'
+		
+		case 'char':
+			$current['value'] = getUrlParameter ($parameterKey,NULL);
+			if ($current['value']) {
+				$current['tokens'] = substr($current['value'],0,1);
+			}
+		break; // case 'char'
+		
+		case 'country':
+			$current['value'] = getUrlParameter ($parameterKey,NULL);
+			if ($current['value']) {
+				$current['tokens'] = explode(',',$current['value']);
+			}
+		break; // case 'country'
+		
+		case 'date':
+			$current['value'] = getUrlParameter ($parameterKey,NULL);
+			if ($current['value']) {
+				$strippedDate = str_replace('-','',$current['value']);
+				switch (strlen($strippedDate)) {
+					case 2:
+						$current['tokens'] = array(
+							'c' => substr($strippedDate,0,2),
+							'y' => NULL,
+							'm' => NULL,
+							'd' => NULL
+						);
+						break;
+					case 4:
+						$current['tokens'] = array(
+							'c' => substr($strippedDate,0,2),
+							'y' => substr($strippedDate,0,4),
+							'm' => NULL,
+							'd' => NULL
+						);
+						break;
+					case 6:
+						$current['tokens'] = array(
+							'c' => substr($strippedDate,0,2),
+							'y' => substr($strippedDate,0,4),
+							'm' => substr ($strippedDate,4,2),
+							'd' => NULL
+						);
+						break;
+					case 8:
+						$current['tokens'] = array(
+							'c' => substr($strippedDate,0,2),
+							'y' => substr($strippedDate,0,4),
+							'm' => substr ($strippedDate,4,2),
+							'd' => substr ($strippedDate,6,2)
+						);
+						break;
+					default:
+						// invalid
+						$current['tokens'] = array(
+							'c' => NULL,
+							'y' => NULL,
+							'm' => NULL,
+							'd' => NULL
+						);
+						break;
+				}
+			}
+			else {
+				$current['tokens'] = array(
+					'c' => NULL,
+					'y' => NULL,
+					'm' => NULL,
+					'd' => NULL
+				);
+			}
+		break; // case 'date'
+		
+		default: break;
 	}
-}
-else {
-	$get['yearOfBirth'] = NULL;
-	$get['monthOfBirth'] = NULL;
-	$get['dayOfBirth'] = NULL;
-}
-
-$get['dateOfDeath'] = getUrlParameter ('dd',NULL);
-if ($get['dateOfDeath']){
-	$get['dateOfDeath'] = str_replace('-','',$get['dateOfDeath']);
-	switch (strlen($get['dateOfDeath'])) {
-		case 4:
-			$get['yearOfDeath'] = substr ($get['dateOfDeath'],0,4);
-			$get['monthOfDeath'] = NULL;
-			$get['dayOfDeath'] = NULL;
-			break;
-		case 6:
-			$get['yearOfDeath'] = substr ($get['dateOfDeath'],0,4);
-			$get['monthOfDeath'] = substr ($get['dateOfDeath'],4,2);
-			$get['dayOfDeath'] = NULL;
-			break;
-		case 8:
-			$get['yearOfDeath'] = substr ($get['dateOfDeath'],0,4);
-			$get['monthOfDeath'] = substr ($get['dateOfDeath'],4,2);
-			$get['dayOfDeath'] = substr ($get['dateOfDeath'],6,2);
-			break;
-		default:
-			// invalid
-			$get['dateOfDeath'] = NULL;
-			$get['yearOfDeath'] = NULL;
-			$get['monthOfDeath'] = NULL;
-			$get['dayOfDeath'] = NULL;
-			break;
-	}
-}
-else {
-	$get['yearOfDeath'] = NULL;
-	$get['monthOfDeath'] = NULL;
-	$get['dayOfDeath'] = NULL;
 }
 
 ?>

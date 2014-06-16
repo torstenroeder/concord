@@ -1,17 +1,24 @@
 <?php
 
-function mysql_wiki_search (&$scores, &$persons, $parameters, $value) {
+function mysql_wiki_search (&$personScores, &$persons, $parameterKey) {
+	$current = &$GLOBALS['parameters'][$parameterKey];
+	//$partialScore = $current['score'] / count($current['queries']);
 	$qs = 'SELECT * FROM pd WHERE ';
-	$qs .= '('.implode(') AND (',$parameters).')';
-	$qs .= ' LIMIT 1000';
-	// echo $qs; exit;
+	$qs .= '('.implode(') AND (',$current['queries']).')';
+	$qs .= ' LIMIT '.LIMIT_MATCHES;
 	if ($results = mysql_query($qs)) {
-		while ($result = mysql_fetch_object($results)) {
-			if (!isset($scores[$result->id])) {
-				$scores[$result->id] = 0;
-				$persons[$result->id] = $result;
+		$current['matches'] = mysql_num_rows($results);
+		if (mysql_num_rows($results) < LIMIT_MATCHES) {
+			while ($result = mysql_fetch_object($results)) {
+				if (!isset($personScores[$result->id])) {
+					$personScores[$result->id] = 0; // Person anlegen
+					$persons[$result->id] = $result; // Datensatz der Person festhalten
+				}
+				$personScores[$result->id] += $current['score']; // Punktzahl zur Person hinzufügen
 			}
-			$scores[$result->id] += $value;
+		}
+		else {
+			// too many matches - this query should work only supportively
 		}
 	}
 	else {
@@ -21,18 +28,22 @@ function mysql_wiki_search (&$scores, &$persons, $parameters, $value) {
 
 // get results and calculate scores
 
-$maxPossibleScore = 0;
-
-$scores = array();
 $persons = array();
+$personScores = array();
 
-foreach ($queries as $key => $query) {
-	mysql_wiki_search ($scores, $persons, $query, $contexts[$key]['score']);
-	$maxPossibleScore += $contexts[$key]['score'];
+$optimalScore = 0;
+
+//print_r($queries); exit;
+
+foreach ($parameters as $parameterKey => $parameter) {
+	if (count($parameter['queries']) > 0) {
+		$optimalScore += $parameter['score'];
+		mysql_wiki_search ($personScores, $persons, $parameterKey);
+	}
 }
-$maxAffidability = floor(100 * $maxPossibleScore / $superScore);
-
-arsort($scores);
-// scores enthält jetzt eine sortierte Liste mit möglichen Personen-IDs
+$requestQuality = floor(100 * $optimalScore / $perfectScore);
+arsort($personScores);
+// $personScores enthält jetzt eine sortierte Liste mit möglichen Personen-IDs
+//print_r ($personScores); exit;
 
 ?>
